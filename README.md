@@ -1,35 +1,33 @@
-# BridgeAPI SDK
+
+# 🛠️ **BridgeAPI SDK**
 
 [![Latest Version](https://img.shields.io/packagist/v/tonvendor/bridgeapi-sdk.svg?style=flat-square)](https://packagist.org/packages/tonvendor/bridgeapi-sdk)
 [![Total Downloads](https://img.shields.io/packagist/dt/tonvendor/bridgeapi-sdk.svg?style=flat-square)](https://packagist.org/packages/tonvendor/bridgeapi-sdk)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](#license)
 
-**BridgeAPI SDK** est un SDK minimaliste pour interagir avec l’API Bridge (ex‑Bankin’).
-Il fournit une interface simple pour :
+**BridgeAPI SDK** est un SDK minimaliste conçu pour faciliter l'intégration avec l'API **BridgeAPI**. Il fournit une interface simple pour :
 
-- Créer et gérer des **Users**
-- Récupérer leurs **Items** (banques connectées)
-- Lister et gérer leurs **Accounts**
-- Lister et manipuler leurs **Transactions**
-- Récupérer leurs **Stocks**
+- ✅ **Créer et gérer des utilisateurs (Users)**
+- ✅ **Authentifier des utilisateurs et obtenir des tokens sécurisés**
+- ✅ **Créer et gérer des sessions de connexion (ConnectSession)**
 
 ---
 
-## Sommaire
+## 📚 **Sommaire**
 
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Utilisation](#utilisation)
+- [🚀 Installation](#installation)
+- [⚙️ Configuration](#configuration)
+- [📦 Utilisation](#utilisation)
   - [Exemple de code](#exemple-de-code)
-- [Ressources disponibles](#ressources-disponibles)
-- [Contribuer](#contribuer)
-- [Licence](#licence)
+- [🔗 Ressources disponibles](#ressources-disponibles)
+- [🤝 Contribuer](#contribuer)
+- [📝 Licence](#licence)
 
 ---
 
-## Installation
+## 🚀 **Installation**
 
-Requiert **PHP >= 7.4** et [Composer](https://getcomposer.org/).
+Requiert **PHP >= 8.0** et [Composer](https://getcomposer.org/).
 
 ```bash
 composer require tonvendor/bridgeapi-sdk
@@ -37,75 +35,126 @@ composer require tonvendor/bridgeapi-sdk
 
 Une fois installé, le SDK est disponible via l’autoload de Composer.
 
-## Configuration
+---
 
-Avant d’utiliser le SDK, assurez-vous de disposer de vos identifiants Bridge :
-- CLIENT_ID
-- CLIENT_SECRET
-- ENV (sandbox ou production)
+## ⚙️ **Configuration**
 
-Vous pouvez les stocker dans un fichier .env (ou utiliser n’importe quel autre moyen), puis transmettre ces valeurs au SDK via la classe BridgeConfig.
+Avant d’utiliser le SDK, assurez-vous de disposer de vos identifiants **BridgeAPI** :
 
-## Utilisation
+- **CLIENT_ID**
+- **CLIENT_SECRET**
+- **API_VERSION** (par défaut : `2025-01-15`)
 
-### Exemple de code
+Ajoutez ces informations dans votre fichier `.env` :
+
+```dotenv
+BRIDGE_CLIENT_ID=your_client_id
+BRIDGE_CLIENT_SECRET=your_client_secret
+BRIDGE_API_VERSION=2025-01-15
+```
+
+---
+
+## 📦 **Utilisation**
+
+### 🔑 **1. Initialisation du client**
 
 ```php
 <?php
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use TonVendor\BridgeSDK\BridgeConfig;
-use TonVendor\BridgeSDK\BridgeClient;
+use Intervalle\BridgeSDK\BridgeConfig;
+use Intervalle\BridgeSDK\BridgeClient;
 
-// 1. Créez la config
+// Initialisation de la configuration
 $config = new BridgeConfig(
-    'YOUR_CLIENT_ID',
-    'YOUR_CLIENT_SECRET',
-    false // false => sandbox, true => production
+    getenv('BRIDGE_CLIENT_ID'),
+    getenv('BRIDGE_CLIENT_SECRET'),
+    getenv('BRIDGE_API_VERSION')
 );
 
-// 2. Instanciez le client
+// Création du client
 $client = new BridgeClient($config);
-
-// 3. Créez un utilisateur
-$user = $client->users()->create([
-    'email'    => 'example.user@yourapp.com',
-    'country'  => 'FR',
-    'currency' => 'EUR',
-]);
-
-// 4. Récupérez la liste de ses comptes
-$accounts = $client->accounts()->listUserAccounts($user['uuid']);
-
-// 5. Transactions du premier compte
-if (!empty($accounts)) {
-    $transactions = $client->transactions()->listAccountTransactions(
-        $user['uuid'],
-        $accounts[0]['uuid'],
-        ['limit' => 50, 'offset' => 0]
-    );
-    print_r($transactions);
-}
 ```
 
-Pour plus de détails sur les endpoints, référez-vous à la documentation officielle Bridge.
+---
 
-## Ressources disponibles
+### 👤 **2. Création d'un utilisateur**
 
-Le SDK propose différentes resources pour interagir avec les entités principales de l’API Bridge :
-- Users : create(), get(), etc.
-- Items : listUserItems(), etc.
-- Accounts : listUserAccounts(), etc.
-- Transactions : listAccountTransactions(), etc.
-- Stocks : listAccountStocks(), etc.
+```php
+// Créer un nouvel utilisateur
+$userUuid = $client->users()->createUser('user-001');
+echo "UUID de l'utilisateur : $userUuid";
+```
 
-Chacune est accessible via les méthodes du BridgeClient.
-Libre à vous d’hériter de ces classes si vous souhaitez ajouter des méthodes personnalisées.
+---
 
-## Licence
+### 🔐 **3. Authentification utilisateur**
 
-Ce SDK est distribué sous licence MIT.
+```php
+// Authentifier l'utilisateur et obtenir un token
+$userToken = $client->auth()->getUserToken($userUuid);
+echo "Token utilisateur : $userToken";
+```
+
+---
+
+### 🌐 **4. Créer une session Connect**
+
+```php
+// Créer une session pour connecter un compte bancaire
+$connectUrl = $client->connectSession()->createSession($userToken, 'testuser@example.com');
+echo "Lien de connexion : $connectUrl";
+```
+
+---
+
+## 🔗 **Ressources disponibles**
+
+Le SDK propose différentes ressources pour interagir avec les entités principales de l’API Bridge :
+
+| 📚 **Ressource** | 🔑 **Méthodes disponibles** |
+|------------------|----------------------------|
+| **Users**       | `createUser()`             |
+| **Auth**        | `getUserToken()`           |
+| **ConnectSession** | `createSession()`       |
+
+Ces ressources sont accessibles via le client principal :
+
+```php
+$client->users();
+$client->auth();
+$client->connectSession();
+```
+
+---
+
+## 🤝 **Contribuer**
+
+Les contributions sont les bienvenues ! Voici les étapes pour participer :
+
+1. **Fork** le dépôt.
+2. **Clone** votre fork : `git clone https://github.com/votre-nom-utilisateur/bridgeapi-sdk.git`
+3. Créez une nouvelle branche : `git checkout -b feature/your-feature`
+4. Faites vos modifications et ajoutez-les : `git add .`
+5. Committez vos modifications : `git commit -m "Ajout d'une nouvelle fonctionnalité"`
+6. Poussez votre branche : `git push origin feature/your-feature`
+7. Créez une **Pull Request** sur GitHub.
+
+---
+
+## 📝 **Licence**
+
+Ce SDK est distribué sous licence **MIT**.
 Vous êtes libre de l’utiliser, le modifier et le redistribuer.
 
-© Bruno ANTUNES – 2024
+© **Bruno ANTUNES** – 2024
+
+---
+
+## 📧 **Support**
+
+En cas de problème, ouvrez une issue sur le [dépôt GitHub](https://github.com/bantunesm/bridgeapi-sdk/issues).
+
+---

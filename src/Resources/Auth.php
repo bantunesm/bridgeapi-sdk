@@ -5,7 +5,7 @@ namespace Intervalle\BridgeSDK\Resources;
 use GuzzleHttp\Client;
 use Intervalle\BridgeSDK\Exceptions\BridgeApiException;
 
-class Users
+class Auth
 {
     protected Client $httpClient;
 
@@ -15,26 +15,26 @@ class Users
     }
 
     /**
-     * Crée un nouvel utilisateur BridgeAPI.
+     * Authentifie un utilisateur et récupère son token.
      *
-     * @param string $externalUserId
+     * @param string $userUuid
      * @return string
      * @throws BridgeApiException
      */
-    public function createUser(string $externalUserId): string
+    public function getUserToken(string $userUuid): string
     {
         try {
-            $response = $this->httpClient->post('/v3/aggregation/users', [
+            $response = $this->httpClient->post('/v3/aggregation/authorization/token', [
                 'json' => [
-                    'external_user_id' => $externalUserId,
+                    'user_uuid' => $userUuid,
                 ],
             ]);
 
-            $body = json_decode((string) $response->getBody(), true);
-            return $body['uuid'] ?? throw new BridgeApiException('UUID manquant dans la réponse.');
+            $body = json_decode((string)$response->getBody(), true);
+            return $body['access_token'] ?? throw new BridgeApiException('Token manquant dans la réponse.');
         } catch (\Throwable $e) {
             throw new BridgeApiException(
-                'Erreur lors de la création de l\'utilisateur : ' . $e->getMessage(),
+                'Erreur lors de l\'authentification : ' . $e->getMessage(),
                 $e->getCode(),
                 $e
             );

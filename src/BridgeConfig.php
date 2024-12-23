@@ -6,22 +6,34 @@ class BridgeConfig
 {
     public string $clientId;
     public string $clientSecret;
-    public bool $production;
+    public string $apiVersion;
 
-    public function __construct(
-        string $clientId,
-        string $clientSecret,
-        bool $production = false
-    ) {
+    public function __construct(string $clientId, string $clientSecret, string $apiVersion = '2025-01-15')
+    {
         $this->clientId = $clientId;
         $this->clientSecret = $clientSecret;
-        $this->production = $production;
+        $this->apiVersion = $apiVersion;
     }
 
+    /**
+     * Retourne toujours l'URL de base avec le préfixe /v3.
+     */
     public function getBaseUri(): string
     {
-        return $this->production
-            ? 'https://api.bridgeapi.io'
-            : 'https://sandbox.bridgeapi.io';
+        return 'https://api.bridgeapi.io';
+    }
+
+    /**
+     * Retourne les en-têtes par défaut.
+     */
+    public function getDefaultHeaders(): array
+    {
+        return [
+            'Bridge-Version' => $this->apiVersion,
+            'Client-Id' => $this->clientId,
+            'Client-Secret' => $this->clientSecret,
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ];
     }
 }
