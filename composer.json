@@ -1,0 +1,21 @@
+{
+    "name": "bantunes/bridgeapi-sdk",
+    "description": "SDK minimaliste pour interagir avec l'API Bridge (ex-Bankin').",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+      {
+        "name": "Bruno ANTUNES",
+        "email": "bantunes@intervalle.io"
+      }
+    ],
+    "autoload": {
+      "psr-4": {
+        "Intervalle\\BridgeSDK\\": "src/"
+      }
+    },
+    "require": {
+      "php": ">=7.4",
+      "guzzlehttp/guzzle": "^7.4"
+    }
+  }
