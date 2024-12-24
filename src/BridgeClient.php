@@ -6,7 +6,9 @@ use GuzzleHttp\Client as Guzzle;
 use Intervalle\BridgeSDK\Exceptions\BridgeApiException;
 use Intervalle\BridgeSDK\Resources\Accounts;
 use Intervalle\BridgeSDK\Resources\Auth;
+use Intervalle\BridgeSDK\Resources\Categories;
 use Intervalle\BridgeSDK\Resources\ConnectSession;
+use Intervalle\BridgeSDK\Resources\Insights;
 use Intervalle\BridgeSDK\Resources\Items;
 use Intervalle\BridgeSDK\Resources\Transactions;
 use Intervalle\BridgeSDK\Resources\Users;
@@ -59,5 +61,15 @@ class BridgeClient
     public function transactions(): Transactions
     {
         return new Transactions($this->guzzle);
+    }
+
+    public function categories(): Categories
+    {
+        return new Categories($this->guzzle);
+    }
+
+    public function insights(): Insights
+    {
+        return new Insights($this->guzzle);
     }
 }
